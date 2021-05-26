@@ -6,7 +6,7 @@ const config = require("./config/key");
 const mongoose = require("mongoose");
 const axios = require("axios");
 const server_key =
-  "AAAAhVuRGao:APA91bEZ15EjAFz5w_TY8i-YyQZZLpgsBasnhulSE4skcJfF2PNHU5nVCjXFdYFv1mSJ3rtNDxSVYDiJP17XFKPEoT_FT_CCAckvDqc57lAW4FmNvawi2QGUSyIwJEeheIWiFONAv7f0";
+  "AAAAhVuRGao:APA91bFVgO10wPOzzoy_q9cMtx9XeN_iSeKJ4jyUUw6KFQZtgEhii9sTtpwBX7IdClIe8bVCMxfIlR5vRbRxVKsvDtWmQwEx1bd0grsWNwKqLTHr1aH-x0LlY39WY-kiNVv4SJbc_hlv";
 
 mongoose
   .connect(config.mongoURI, {
@@ -49,7 +49,7 @@ function checker() {
   }
   curtime += String(kr_t.getMinutes());
   console.log(curtime);
-
+  console.log(a.getSeconds());
   Habit.find(
     //현재 시간과 맞는 습관만 조회, 프로젝션
     { "habit.habittime": curtime },
@@ -58,17 +58,17 @@ function checker() {
     }
   )
     .populate({
-      path: "users",
+      path: "achievement.userid",
       match: { token: { $ne: "" }, fcm_token: { $ne: "" } }, //로그인 되어있고 fcm토큰이 있는 경우만 프로젝션
     })
     .exec((err, data) => {
       for (i in data) {
         console.log(data[i]);
-        for (j in data[i].users) {
+        for (j in data[i].achievement) {
           for (k in data[i].habit) {
             send_msg(
               server_key,
-              data[i].users[j].fcm_token,
+              data[i].achievement[j].userid.fcm_token,
               data[i].habit[k].signal,
               data[i].habit[k].habit
             );
@@ -78,4 +78,6 @@ function checker() {
       console.log(err);
     });
 }
-setInterval(checker, 3000);
+var aa = new Date();
+console.log(aa.getSeconds());
+setInterval(checker, 60000);
